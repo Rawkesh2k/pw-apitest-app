@@ -41,18 +41,7 @@ test("has text", async ({ page }) => {
 
 test("Delete article", async ({ page, request }) => {
   //import the below request from playwright library
-  const response = await request.post(
-    "https://conduit-api.bondaracademy.com/api/users/login",
-    {
-      data: {
-        user: { email: "pwtest@test.com", password: "Welcome1" },
-      },
-    }
-  );
 
-  const responseBody = await response.json();
-  console.log(responseBody.user.token);
-  const accessToken = responseBody.user.token;
   const articleResponse = await request.post(
     "https://conduit-api.bondaracademy.com/api/articles/",
     {
@@ -63,9 +52,6 @@ test("Delete article", async ({ page, request }) => {
           body: "Test bodycreated through API",
           tagList: [],
         },
-      },
-      headers: {
-        Authorization: `Token ${accessToken}`,
       },
     }
   );
@@ -113,25 +99,8 @@ test("create article", async ({ page, request }) => {
     "Test: Title API Article creation Brother"
   );
 
-  const response = await request.post(
-    "https://conduit-api.bondaracademy.com/api/users/login",
-    {
-      data: {
-        user: { email: "pwtest@test.com", password: "Welcome1" },
-      },
-    }
-  );
-
-  const responseBody = await response.json();
-  console.log(responseBody.user.token);
-  const accessToken = responseBody.user.token;
   const deleteResponse = await request.delete(
-    `https://conduit-api.bondaracademy.com/api/articles/${slugID}`,
-    {
-      headers: {
-        Authorization: `Token ${accessToken}`,
-      },
-    }
+    `https://conduit-api.bondaracademy.com/api/articles/${slugID}`
   );
   expect(deleteResponse.status()).toEqual(204);
 });
