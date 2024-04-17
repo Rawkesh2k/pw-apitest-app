@@ -10,11 +10,9 @@ test.beforeEach(async ({ page }) => {
     }
   );
   await page.goto("https://conduit.bondaracademy.com/");
-  await page.getByText("Sign in").click();
-  await page.getByRole("textbox", { name: "Email" }).fill("pwtest@test.com");
-  await page.getByRole("textbox", { name: "Password" }).fill("Welcome1");
-  await page.getByRole("button").click();
 });
+
+//Test to mock the article
 
 test("has text", async ({ page }) => {
   await page.route("*/**/api/articles*", async (route) => {
@@ -38,6 +36,8 @@ test("has text", async ({ page }) => {
     "This is a Mock description"
   );
 });
+
+//Test to delete the article
 
 test("Delete article", async ({ page, request }) => {
   //import the below request from playwright library
@@ -78,6 +78,8 @@ test("Delete article", async ({ page, request }) => {
     "Test article created through API"
   );
 });
+
+//Test to create the article
 
 test("create article", async ({ page, request }) => {
   await page.getByText("New Article").click();
