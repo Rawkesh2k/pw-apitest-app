@@ -78,3 +78,58 @@ test("Delete article", async ({ page, request }) => {
     "Test article created through API"
   );
 });
+
+test("create article", async ({ page, request }) => {
+  await page.getByText("New Article").click();
+  await page
+    .getByPlaceholder("Article Title")
+    .fill("Test: Title API Article creation Brother");
+  await page
+    .getByPlaceholder("What's this article about?")
+    .fill("Test: Description Content");
+  await page
+    .getByPlaceholder("Write your article (in markdown)")
+    .fill("Test: Body Content");
+  await page.getByRole("button", { name: "Publish Article" }).click();
+
+  const articleResponse = await page.waitForResponse(
+    "https://conduit-api.bondaracademy.com/api/articles/Test:-Title-API-Article-creation-Brother-2"
+  );
+  const articleResponseBody = await articleResponse.json();
+  const slugID = articleResponseBody.article.slug;
+  //A slug ID refers to the part of a URL that uniquely identifies a resource,
+  //often derived from the resource's title or name. For example,
+  //in the URL "https://example.com/blog/post-title",
+  //the "post-title" portion is the slug ID for the specific blog post.
+  console.log("The slug ID is: " + slugID);
+  await expect(page.locator(".article-page h1")).toContainText(
+    "Test: Title API Article creation Brother"
+  );
+  await page.getByText("Home").click();
+  await page.getByText("Global Feed").click();
+  await expect(page.locator("app-article-list h1").first()).toContainText(
+    "Test: Title API Article creation Brother"
+  );
+
+  const response = await request.post(
+    "https://conduit-api.bondaracademy.com/api/users/login",
+    {
+      data: {
+        user: { email: "pwtest@test.com", password: "Welcome1" },
+      },
+    }
+  );
+
+  const responseBody = await response.json();
+  console.log(responseBody.user.token);
+  const accessToken = responseBody.user.token;
+  const deleteResponse = await request.delete(
+    `https://conduit-api.bondaracademy.com/api/articles/${slugID}`,
+    {
+      headers: {
+        Authorization: `Token ${accessToken}`,
+      },
+    }
+  );
+  expect(deleteResponse.status()).toEqual(204);
+});
